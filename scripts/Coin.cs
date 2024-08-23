@@ -2,9 +2,18 @@ using Godot;
 
 public partial class Coin : Area2D
 {
+    GameManager gameManager;
+    AnimationPlayer animationPlayer;
+
+    public override void _Ready()
+    {
+        gameManager = GetNode<GameManager>("%GameManager");
+        animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+    }
+
     private void _OnBodyEntered(Node2D body)
     {
-        GD.Print("+1 Coin!");
-        QueueFree();
+        gameManager.addPoint();
+        animationPlayer.Play("pickup");
     }
 }
