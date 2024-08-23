@@ -5,6 +5,13 @@ public partial class Player : CharacterBody2D
     public const float Speed = 130.0f;
     public const float JumpVelocity = -300.0f;
 
+    AnimatedSprite2D animatedSprite;
+
+    public override void _Ready()
+    {
+        animatedSprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+    }
+
     public override void _PhysicsProcess(double delta)
     {
         Vector2 velocity = Velocity;
@@ -16,17 +23,45 @@ public partial class Player : CharacterBody2D
         }
 
         // Handle Jump.
-        if (Input.IsActionJustPressed("ui_accept") && IsOnFloor())
+        if (Input.IsActionJustPressed("jump") && IsOnFloor())
         {
             velocity.Y = JumpVelocity;
         }
 
-        // Get the input direction and handle the movement/deceleration.
-        // As good practice, you should replace UI actions with custom gameplay actions.
-        Vector2 direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
-        if (direction != Vector2.Zero)
+        // Get input direction: 1, 0 , -1
+        float direction = Input.GetAxis("move_left", "move_right");
+
+        // Flip the sprite
+        if (direction > 0)
         {
-            velocity.X = direction.X * Speed;
+            animatedSprite.FlipH = false;
+        }
+        else if (direction < 0)
+        {
+            animatedSprite.FlipH = true;
+        }
+
+        // Play animations
+        if (IsOnFloor())
+        {
+            if (direction == 0)
+            {
+                animatedSprite.Play("idle");
+            }
+            else
+            {
+                animatedSprite.Play("run");
+            }
+        }
+        else
+        {
+            animatedSprite.Play("jump");
+        }
+
+        // Apply Movement
+        if (direction != 0)
+        {
+            velocity.X = direction * Speed;
         }
         else
         {
